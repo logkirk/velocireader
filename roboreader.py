@@ -38,7 +38,10 @@ def process_epub(input_path, output_path):
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(description="TODO")
+    parser = argparse.ArgumentParser(
+        description="Reformats EPUB ebooks with bolded fixation points at the "
+        "beginning of words to guide your eyes."
+    )
     parser.add_argument("input", help="input EPUB file path")
     parser.add_argument("-o", "--output", help="output EPUB file path", required=False)
     args = parser.parse_args()
