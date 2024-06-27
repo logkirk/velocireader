@@ -18,6 +18,7 @@ roboreader. If not, see <https://www.gnu.org/licenses/>.
 import argparse
 import os
 import zipfile
+from math import ceil
 from pathlib import Path
 
 import regex
@@ -35,21 +36,21 @@ def main():
         if response.lower() not in ["y", ""]:
             return
 
-    process_epub(args.input, args.output)
+    process_epub(args)
     print(f"Conversion complete. Output saved to '{args.output}'.")
 
 
-def process_epub(input_path, output_path):
-    with zipfile.ZipFile(input_path, "r") as zip_ref:
+def process_epub(args):
+    with zipfile.ZipFile(args.input_path, "r") as zip_ref:
         file_list = zip_ref.infolist()
 
-        with zipfile.ZipFile(output_path, "w") as zip_out:
+        with zipfile.ZipFile(args.output_path, "w") as zip_out:
             for file_info in file_list:
                 with zip_ref.open(file_info) as file:
                     content = file.read()
 
                     if file_info.filename.endswith((".xhtml", ".html", ".htm")):
-                        content = _process_file(content)
+                        content = _process_file(content, args)
 
                     zip_out.writestr(file_info, content)
 
@@ -61,6 +62,15 @@ def _parse_args():
     )
     parser.add_argument("input", help="input EPUB file path")
     parser.add_argument("-o", "--output", help="output EPUB file path", required=False)
+    parser.add_argument(
+        "-f",
+        "--fixation",
+        default=2,
+        choices=range(1, 6),
+        help="amount of text to embolden at the beginning of each word, from 1-5. "
+        "Default 2",
+        required=False,
+    )
     args = parser.parse_args()
 
     args.input = Path(args.input)
@@ -72,38 +82,34 @@ def _parse_args():
     return args
 
 
-def _process_file(content):
+def _process_file(content, args):
     soup = BeautifulSoup(content, features="xml")
 
     skip_tags = {"script", "style", "pre", "code"}
 
     for element in soup.find_all(string=True):
         if element.parent.name not in skip_tags:
-            new_text = _process_text(element.string)
+            new_text = _process_text(element.string, args)
             new_element = BeautifulSoup(new_text, "html.parser")
             element.replace_with(new_element)
 
     return str(soup)
 
 
-def _process_text(text):
+def _process_text(text, args):
     word_pattern = regex.compile(r"\b[\p{L}\p{M}]+\b", regex.UNICODE)
 
     def replace_word(match):
         word = match.group(0)
-        return _robotize_word(word)
+        return _robotize_word(word, args)
 
     return word_pattern.sub(replace_word, text)
 
 
-def _robotize_word(word):
-    if len(word) <= 1:
-        return word
-    elif len(word) <= 3:
-        return f"<b>{word[:1]}</b>{word[1:]}"
-    else:
-        midpoint = len(word) // 2
-        return f"<b>{word[:midpoint]}</b>{word[midpoint:]}"
+def _robotize_word(word, args):
+    x = args.fixation
+    threshold = ceil((25.4 - 8.5 * x + 7.75 * x**2 - 0.75 * x**3) / 100 * len(word))
+    return f"<b>{word[:threshold]}</b>{word[threshold:]}"
 
 
 if __name__ == "__main__":
