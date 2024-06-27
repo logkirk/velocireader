@@ -11,6 +11,9 @@ roboreader
 Reformats EPUB ebooks with bolded fixation points at the beginning 
 of words to guide your eyes.
 
+> ℹ️ **Note**  
+> The canonical project locations are linked above. Other locations are mirrors.
+
 Installation
 ------------
 
