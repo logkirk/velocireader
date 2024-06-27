@@ -31,8 +31,8 @@ def process_epub(input_path, output_path):
                 with zip_ref.open(file_info) as file:
                     content = file.read()
 
-                    if file_info.filename.endswith((".html", ".xhtml", ".htm")):
-                        content = _process_html_content(content)
+                    if file_info.filename.endswith((".xhtml", ".html", ".htm")):
+                        content = _process_file(content)
 
                     zip_out.writestr(file_info, content)
 
@@ -52,12 +52,12 @@ def _parse_args():
     return args
 
 
-def _process_html_content(content):
-    soup = BeautifulSoup(content, features="lxml")
+def _process_file(content):
+    soup = BeautifulSoup(content, features="xml")
 
     skip_tags = {"script", "style", "pre", "code"}
 
-    for element in soup.find_all(text=True):
+    for element in soup.find_all(string=True):
         if element.parent.name not in skip_tags:
             new_text = _process_text(element.string)
             new_element = BeautifulSoup(new_text, "html.parser")
