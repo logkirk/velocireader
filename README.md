@@ -7,6 +7,7 @@ roboreader
 [issues](https://todo.sr.ht/~logankirkland/roboreader)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![builds.sr.ht status](https://builds.sr.ht/~logankirkland/roboreader.svg)](https://builds.sr.ht/~logankirkland/roboreader?)
 
 Reformats EPUB ebooks with bolded fixation points at the beginning 
 of words to guide your eyes.
