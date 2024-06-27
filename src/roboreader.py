@@ -102,6 +102,7 @@ def _parse_args():
         "-f",
         "--fixation",
         default=2,
+        type=int,
         choices=range(1, 6),
         required=False,
         help="amount of text to embolden at the beginning of each word, from 1-5. "
