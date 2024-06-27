@@ -20,13 +20,34 @@ import os
 import zipfile
 from math import ceil
 from pathlib import Path
+from textwrap import fill
 
 import regex
 from bs4 import BeautifulSoup
 
 
+WRAP_WIDTH = 80
+
+
+class Color:
+    PURPLE = "\033[95m"
+    CYAN = "\033[96m"
+    DARKCYAN = "\033[36m"
+    BLUE = "\033[94m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    END = "\033[0m"
+
+
 def main():
     args = _parse_args()
+
+    if args.demo:
+        demo(args)
+        return
 
     if os.path.exists(args.output):
         response = input(
@@ -38,6 +59,21 @@ def main():
 
     process_epub(args)
     print(f"Conversion complete. Output saved to '{args.output}'.")
+
+
+def demo(args):
+    with open("resources/sample_peter_pan.txt", "r") as f:
+        raw = f.read()
+
+    paragraphs = [i for i in raw.split("\n") if i != ""]
+    wrapped = [fill(i, width=WRAP_WIDTH, initial_indent="    ") for i in paragraphs]
+
+    for paragraph in wrapped:
+        print(paragraph)
+
+    print()
+    for paragraph in [_process_text(i, args) for i in wrapped]:
+        print(paragraph)
 
 
 def process_epub(args):
@@ -60,24 +96,36 @@ def _parse_args():
         description="Reformats EPUB ebooks with bolded fixation points at the "
         "beginning of words to guide your eyes."
     )
-    parser.add_argument("input", help="input EPUB file path")
-    parser.add_argument("-o", "--output", help="output EPUB file path", required=False)
+    parser.add_argument("input", nargs="?", default=None, help="input EPUB file path")
+    parser.add_argument("-o", "--output", required=False, help="output EPUB file path")
     parser.add_argument(
         "-f",
         "--fixation",
         default=2,
         choices=range(1, 6),
+        required=False,
         help="amount of text to embolden at the beginning of each word, from 1-5. "
         "Default 2",
+    )
+    parser.add_argument(
+        "-d",
+        "--demo",
+        action="store_true",
+        default=False,
         required=False,
+        help="print a sample text processed with the selected settings",
     )
     args = parser.parse_args()
 
-    args.input = Path(args.input)
-    if args.output is None:
-        args.output = args.input.with_stem(args.input.stem + "_robo")
-    else:
-        args.output = Path(args.output)
+    if not args.demo:
+        if args.input is None:
+            parser.error("the following arguments are required: input")
+
+        args.input = Path(args.input)
+        if args.output is None:
+            args.output = args.input.with_stem(args.input.stem + "_robo")
+        else:
+            args.output = Path(args.output)
 
     return args
 
@@ -109,7 +157,10 @@ def _process_text(text, args):
 def _robotize_word(word, args):
     x = args.fixation
     threshold = ceil((25.4 - 8.5 * x + 7.75 * x**2 - 0.75 * x**3) / 100 * len(word))
-    return f"<b>{word[:threshold]}</b>{word[threshold:]}"
+    if args.demo:
+        return f"{Color.BOLD}{word[:threshold]}{Color.END}{word[threshold:]}"
+    else:
+        return f"<b>{word[:threshold]}</b>{word[threshold:]}"
 
 
 if __name__ == "__main__":
