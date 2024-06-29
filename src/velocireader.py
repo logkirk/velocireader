@@ -25,11 +25,10 @@ from textwrap import fill
 import regex
 from bs4 import BeautifulSoup
 
-
 WRAP_WIDTH = 80
 
 
-class Color:
+class TextEffect:
     PURPLE = "\033[95m"
     CYAN = "\033[96m"
     DARKCYAN = "\033[36m"
@@ -44,6 +43,12 @@ class Color:
 
 def main():
     args = _parse_args()
+
+    if args.distance != 1:
+        print(
+            "Warning: the -d/--distance argument is not yet implemented and will be "
+            "ignored."
+        )
 
     if args.demo:
         demo(args)
@@ -99,22 +104,30 @@ def _parse_args():
     parser.add_argument("input", nargs="?", default=None, help="input EPUB file path")
     parser.add_argument("-o", "--output", required=False, help="output EPUB file path")
     parser.add_argument(
-        "-f",
-        "--fixation",
+        "-s",
+        "--strength",
         default=2,
         type=int,
         choices=range(1, 6),
         required=False,
-        help="amount of text to embolden at the beginning of each word, from 1-5. "
+        help="amount of text to bold at the beginning of each word, from 1-5. "
         "Default 2",
     )
     parser.add_argument(
         "-d",
+        "--distance",
+        default=1,
+        type=int,
+        choices=range(1, 6),
+        required=False,
+        help="distance between bolded words, from 1-5. Default 1",
+    )
+    parser.add_argument(
         "--demo",
         action="store_true",
         default=False,
         required=False,
-        help="print a sample text processed with the selected settings",
+        help="print a sample of text processed with the selected settings",
     )
     args = parser.parse_args()
 
@@ -156,10 +169,10 @@ def _process_text(text, args):
 
 
 def _robotize_word(word, args):
-    x = args.fixation
+    x = args.strength
     threshold = ceil((25.4 - 8.5 * x + 7.75 * x**2 - 0.75 * x**3) / 100 * len(word))
     if args.demo:
-        return f"{Color.BOLD}{word[:threshold]}{Color.END}{word[threshold:]}"
+        return f"{TextEffect.BOLD}{word[:threshold]}{TextEffect.END}{word[threshold:]}"
     else:
         return f"<b>{word[:threshold]}</b>{word[threshold:]}"
 
