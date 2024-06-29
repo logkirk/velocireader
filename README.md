@@ -1,13 +1,13 @@
-roboreader
-==========
+velocireader
+============
 
-[project](https://sr.ht/~logankirkland/roboreader/) / 
-[repo](https://git.sr.ht/~logankirkland/roboreader) / 
-[mailing list](https://lists.sr.ht/~logankirkland/roboreader) /
-[issues](https://todo.sr.ht/~logankirkland/roboreader)
+[project](https://sr.ht/~logankirkland/velocireader/) / 
+[repo](https://git.sr.ht/~logankirkland/velocireader) / 
+[mailing list](https://lists.sr.ht/~logankirkland/velocireader) /
+[issues](https://todo.sr.ht/~logankirkland/velocireader)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![builds.sr.ht status](https://builds.sr.ht/~logankirkland/roboreader.svg)](https://builds.sr.ht/~logankirkland/roboreader?)
+[![builds.sr.ht status](https://builds.sr.ht/~logankirkland/velocireader.svg)](https://builds.sr.ht/~logankirkland/velocireader?)
 
 Reformats EPUB ebooks with bolded fixation points at the beginning 
 of words to guide your eyes.
@@ -21,7 +21,7 @@ Installation
 ### Clone the repo
 
 ```shell
-git clone https://sr.ht/~logankirkland/roboreader/
+git clone https://sr.ht/~logankirkland/velocireader/
 ```
 
 ### Install Python dependencies
@@ -34,11 +34,11 @@ Usage
 -----
 
 ```shell
-python roboreader.py INPUTFILE
+python velocireader.py INPUTFILE
 ```
 
 ```
-usage: roboreader.py [-h] [-o OUTPUT] input
+usage: velocireader.py [-h] [-o OUTPUT] input
 
 Reformats EPUB ebooks with bolded fixation points at the beginning of 
 words to guide your eyes.

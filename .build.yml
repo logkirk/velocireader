@@ -2,7 +2,7 @@ image: alpine/edge
 secrets:
   - bdc7ee56-4468-4651-ba98-909e340e7424
 environment:
-  REPO: roboreader
+  REPO: velocireader
   GH_USER: logkirk
 tasks:
   - write-ssh-config: |
