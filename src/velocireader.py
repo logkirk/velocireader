@@ -24,6 +24,7 @@ from textwrap import fill
 
 import regex
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 WRAP_WIDTH = 80
 
@@ -82,10 +83,15 @@ def demo(args):
 
 
 def process_epub(args):
-    with zipfile.ZipFile(args.input_path, "r") as zip_ref:
+    with zipfile.ZipFile(args.input, "r") as zip_ref:
         file_list = zip_ref.infolist()
 
-        with zipfile.ZipFile(args.output_path, "w") as zip_out:
+        with (
+            zipfile.ZipFile(args.output, "w") as zip_out,
+            tqdm(
+                total=len(file_list), desc="Processing files", unit="file"
+            ) as progress_bar,
+        ):
             for file_info in file_list:
                 with zip_ref.open(file_info) as file:
                     content = file.read()
@@ -94,6 +100,9 @@ def process_epub(args):
                         content = _process_file(content, args)
 
                     zip_out.writestr(file_info, content)
+
+                progress_bar.update(1)
+                progress_bar.set_postfix(current_file=file_info.filename)
 
 
 def _parse_args():
